@@ -1,0 +1,85 @@
+C51 COMPILER V9.00   PCAPLUSE                                                              11/24/2018 15:32:54 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE PCAPLUSE
+OBJECT MODULE PLACED IN PCAPluse.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE PCAPluse.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          #include "reg51.h"
+   2          #include "intrins.h"
+   3          
+   4          
+   5          #define T38K4HZ         (24000000L /2/300000)
+   6          
+   7          sfr     CCON        =   0xd8;
+   8          sbit    CF          =   CCON^7;
+   9          sbit    CR          =   CCON^6;
+  10          sbit    CCF3        =   CCON^3;
+  11          sbit    CCF2        =   CCON^2;
+  12          sbit    CCF1        =   CCON^1;
+  13          sbit    CCF0        =   CCON^0;
+  14          sfr     CMOD        =   0xd9;
+  15          sfr     CL          =   0xe9;
+  16          sfr     CH          =   0xf9;
+  17          sfr     CCAPM0      =   0xda;
+  18          sfr     CCAP0L      =   0xea;
+  19          sfr     CCAP0H      =   0xfa;
+  20          sfr     PCA_PWM0    =   0xf2;
+  21          sfr     CCAPM1      =   0xdb;
+  22          sfr     CCAP1L      =   0xeb;
+  23          sfr     CCAP1H      =   0xfb;
+  24          sfr     PCA_PWM1    =   0xf3;
+  25          sfr     CCAPM2      =   0xdc;
+  26          sfr     CCAP2L      =   0xec;
+  27          sfr     CCAP2H      =   0xfc;
+  28          sfr     PCA_PWM2    =   0xf4;
+  29          sfr     CCAPM3      =   0xdd;
+  30          sfr     CCAP3L      =   0xed;
+  31          sfr     CCAP3H      =   0xfd;
+  32          sfr     PCA_PWM3    =   0xf5;
+  33          
+  34          unsigned int value;
+  35          
+  36          void PCA_Isr() interrupt 7 using 1
+  37          {
+  38   1          CCF0 = 0;
+  39   1          CCAP0L = value;
+  40   1          CCAP0H = value >> 8;
+  41   1          value += T38K4HZ;
+  42   1      }
+  43          
+  44          void main()
+  45          {
+  46   1          CCON = 0x00;
+  47   1          CMOD = 0x08;                                //PCA时钟为系统时钟
+  48   1          CL = 0x00;
+  49   1          CH = 0x00;
+  50   1          CCAPM0 = 0x4d;                              //PCA模块0为16位定时器模式并使能脉冲输出
+  51   1          value = T38K4HZ;
+  52   1          CCAP0L = value;
+  53   1          CCAP0H = value >> 8;
+  54   1          value += T38K4HZ;
+  55   1          CR = 1;                                     //启动PCA计时器
+C51 COMPILER V9.00   PCAPLUSE                                                              11/24/2018 15:32:54 PAGE 2   
+
+  56   1          EA = 1;
+  57   1      
+  58   1          while (1);
+  59   1      }
+  60          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     71    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

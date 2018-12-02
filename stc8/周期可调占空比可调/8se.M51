@@ -1,0 +1,74 @@
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    11/25/2018  13:59:00  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.2.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE 8se.obj TO 8se RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  8se.obj (8SE)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_STARTUP)
+
+
+LINK MAP OF MODULE:  8se (8SE)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            IDATA   0008H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     0034H     UNIT         ?PR?MAIN?8SE
+            CODE    0037H     000CH     UNIT         ?C_C51STARTUP
+
+
+
+OVERLAY MAP OF MODULE:   8se (8SE)
+
+
+SEGMENT
+  +--> CALLED SEGMENT
+---------------------
+?C_C51STARTUP
+  +--> ?PR?MAIN?8SE
+
+
+
+SYMBOL TABLE OF MODULE:  8se (8SE)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        8SE
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:00FEH         PUBLIC        PWMCR
+  D:00BAH         PUBLIC        P_SW2
+  C:0003H         PUBLIC        main
+  -------         PROC          MAIN
+  C:0003H         LINE#         49
+  C:0003H         LINE#         50
+  C:0003H         LINE#         51
+  C:0006H         LINE#         52
+  C:000CH         LINE#         53
+  C:0012H         LINE#         54
+  C:001CH         LINE#         55
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  11/25/2018  13:59:00  PAGE 2
+
+
+  C:0023H         LINE#         56
+  C:002BH         LINE#         57
+  C:002FH         LINE#         58
+  C:0032H         LINE#         60
+  C:0035H         LINE#         62
+  -------         ENDPROC       MAIN
+  -------         ENDMOD        8SE
+
+Program Size: data=9.0 xdata=0 code=67
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

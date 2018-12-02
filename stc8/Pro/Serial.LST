@@ -1,0 +1,155 @@
+C51 COMPILER V9.00   SERIAL                                                                11/24/2018 20:50:36 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE SERIAL
+OBJECT MODULE PLACED IN Serial.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Serial.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          #include "reg51.h"
+   2          #include "intrins.h"
+   3          /////////////////PWM////////////////
+   4          sfr     P_SW2       =   0xba;
+   5          sfr     PWMCFG      =   0xf1;
+   6          sfr     PWMIF       =   0xf6;
+   7          sfr     PWMFDCR     =   0xf7;
+   8          sfr     PWMCR       =   0xfe;
+   9          //system time clock div
+  10          #define CLKDIV          (*(unsigned char volatile xdata *)0xfe01)
+  11          #define PWMC            (*(unsigned int volatile xdata *)0xfff0)
+  12          #define PWMCKS          (*(unsigned char volatile xdata *)0xfff2)
+  13          #define TADCP           (*(unsigned int volatile xdata *)0xfff3)
+  14          #define PWM0T1          (*(unsigned int volatile xdata *)0xff00)
+  15          #define PWM0T2          (*(unsigned int volatile xdata *)0xff02)
+  16          #define PWM0CR          (*(unsigned char volatile xdata *)0xff04)
+  17          #define FOSC            24000000/2
+  18          #define BRT             (65536 - FOSC / 115200 / 4)
+  19          /////////////AD/////////////////////////////
+  20          sfr     ADC_CONTR   =   0xbc;
+  21          sfr     ADC_RES     =   0xbd;
+  22          sfr     ADC_RESL    =   0xbe;
+  23          sfr     ADCCFG      =   0xde;
+  24          
+  25          sfr     P1M0        =   0x92;
+  26          sfr     P1M1        =   0x91;
+  27          /////////////Serial/////////////////////////////
+  28          sfr     AUXR        =   0x8e;
+  29          sfr     T2H         =   0xd6;
+  30          sfr     T2L         =   0xd7;
+  31          
+  32          bit busy;
+  33          char wptr;
+  34          char rptr;
+  35          char buffer[16];
+  36          
+  37          void UartIsr() interrupt 4 using 1
+  38          {
+  39   1          if (TI)
+  40   1          {
+  41   2              TI = 0;
+  42   2              busy = 0;
+  43   2          }
+  44   1          if (RI)
+  45   1          {
+  46   2              RI = 0;
+  47   2              buffer[wptr++] = SBUF;
+  48   2              wptr &= 0x0f;
+  49   2          }
+  50   1      }
+  51          
+  52          void UartInit()
+  53          {
+  54   1          SCON = 0x50;
+  55   1          T2L = BRT;
+C51 COMPILER V9.00   SERIAL                                                                11/24/2018 20:50:36 PAGE 2   
+
+  56   1          T2H = BRT >> 8;
+  57   1          AUXR = 0x15;
+  58   1          wptr = 0x00;
+  59   1          rptr = 0x00;
+  60   1          busy = 0;
+  61   1      }
+  62          
+  63          void UartSend(char dat)
+  64          {
+  65   1          while (busy);
+  66   1          busy = 1;
+  67   1          SBUF = dat;
+  68   1      }
+  69          
+  70          void UartSendStr(char *p)
+  71          {
+  72   1          while (*p)
+  73   1          {
+  74   2              UartSend(*p++);
+  75   2          }
+  76   1      }
+  77          void PWM(int value)
+  78          {
+  79   1          //////////////////////////PWM////////////
+  80   1          P_SW2 = 0x80;
+  81   1          CLKDIV=0x02;
+  82   1          PWMCKS = 0x0F;                              // PWM时钟为系统时钟
+  83   1          PWMC = 0x7fff;                              //设置PWM周期为32767H个PWM时钟
+  84   1          PWM0T1= 0x0000;                             //在计数值为000H地方输出低电平
+  85   1          PWM0T2= 0x2000;                             //在计数值为PWM0T2地方输出高电平,数值越小高电平时间越长
+  86   1          PWM0CR= 0x80;                               //使能PWM0输出
+  87   1          P_SW2 = 0x00;
+  88   1      
+  89   1          PWMCR = 0x80;                               //启动PWM模块
+  90   1      }
+*** WARNING C280 IN LINE 77 OF SERIAL.C: 'value': unreferenced local variable
+  91          
+  92          
+  93          void main()
+  94          {
+  95   1        
+  96   1        
+  97   1         P1M0 = 0x00;                                //设置P1.0为ADC口
+  98   1          P1M1 = 0x01;
+  99   1          ADCCFG = 0x07;                              //设置ADC时钟为系统时钟/2/16/16
+ 100   1          ADC_CONTR = 0x80;                           //使能ADC模块
+ 101   1      
+ 102   1          UartInit();
+ 103   1          ES = 1;
+ 104   1          EA = 1;
+ 105   1          PWM(1);
+ 106   1        
+ 107   1        
+ 108   1          while (1)
+ 109   1          {
+ 110   2              int res=0;
+ 111   2              ADC_CONTR |= 0x40;                      //启动AD转换
+ 112   2              _nop_();
+ 113   2              _nop_();
+ 114   2              while (!(ADC_CONTR & 0x20));            //查询ADC完成标志
+ 115   2              ADC_CONTR &= ~0x20;                     //清完成标志
+ 116   2              res = ADC_RES;
+C51 COMPILER V9.00   SERIAL                                                                11/24/2018 20:50:36 PAGE 3   
+
+ 117   2              res <<= 8;
+ 118   2              res |= ADC_RESL;
+ 119   2              //UartSend(ADC_RES);             
+ 120   2             // UartSend(ADC_RESL);
+ 121   2              //UartSendStr("\r\n");
+ 122   2              //UartSendStr((int)res+"");
+ 123   2            
+ 124   2          }
+ 125   1          
+ 126   1      }
+ 127          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    221    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     18       7
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

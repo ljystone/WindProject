@@ -1,0 +1,89 @@
+C51 COMPILER V9.59.0.0   8SE                                                               11/25/2018 13:59:00 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE 8SE
+OBJECT MODULE PLACED IN 8se.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE 8se.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          #include "reg51.h"
+   2          #include "intrins.h"
+   3          
+   4          
+   5          
+   6          sfr     P_SW2       =   0xba;
+   7          sfr     PWMCFG      =   0xf1;
+   8          sfr     PWMIF       =   0xf6;
+   9          sfr     PWMFDCR     =   0xf7;
+  10          sfr     PWMCR       =   0xfe;
+  11          //system time clock div
+  12          #define CLKDIV          (*(unsigned char volatile xdata *)0xfe01)
+  13          #define PWMC            (*(unsigned int volatile xdata *)0xfff0)
+  14          #define PWMCKS          (*(unsigned char volatile xdata *)0xfff2)
+  15          #define TADCP           (*(unsigned int volatile xdata *)0xfff3)
+  16          #define PWM0T1          (*(unsigned int volatile xdata *)0xff00)
+  17          #define PWM0T2          (*(unsigned int volatile xdata *)0xff02)
+  18          #define PWM0CR          (*(unsigned char volatile xdata *)0xff04)
+  19          #define PWM0HLD         (*(unsigned char volatile xdata *)0xff05)
+  20          #define PWM1T1          (*(unsigned int volatile xdata *)0xff10)
+  21          #define PWM1T2          (*(unsigned int volatile xdata *)0xff12)
+  22          #define PWM1CR          (*(unsigned char volatile xdata *)0xff14)
+  23          #define PWM1HLD         (*(unsigned char volatile xdata *)0xff15)
+  24          #define PWM2T1          (*(unsigned int volatile xdata *)0xff20)
+  25          #define PWM2T2          (*(unsigned int volatile xdata *)0xff22)
+  26          #define PWM2CR          (*(unsigned char volatile xdata *)0xff24)
+  27          #define PWM2HLD         (*(unsigned char volatile xdata *)0xff25)
+  28          #define PWM3T1          (*(unsigned int volatile xdata *)0xff30)
+  29          #define PWM3T2          (*(unsigned int volatile xdata *)0xff32)
+  30          #define PWM3CR          (*(unsigned char volatile xdata *)0xff34)
+  31          #define PWM3HLD         (*(unsigned char volatile xdata *)0xff35)
+  32          #define PWM4T1          (*(unsigned int volatile xdata *)0xff40)
+  33          #define PWM4T2          (*(unsigned int volatile xdata *)0xff42)
+  34          #define PWM4CR          (*(unsigned char volatile xdata *)0xff44)
+  35          #define PWM4HLD         (*(unsigned char volatile xdata *)0xff45)
+  36          #define PWM5T1          (*(unsigned int volatile xdata *)0xff50)
+  37          #define PWM5T2          (*(unsigned int volatile xdata *)0xff52)
+  38          #define PWM5CR          (*(unsigned char volatile xdata *)0xff54)
+  39          #define PWM5HLD         (*(unsigned char volatile xdata *)0xff55)
+  40          #define PWM6T1          (*(unsigned int volatile xdata *)0xff60)
+  41          #define PWM6T2          (*(unsigned int volatile xdata *)0xff62)
+  42          #define PWM6CR          (*(unsigned char volatile xdata *)0xff64)
+  43          #define PWM6HLD         (*(unsigned char volatile xdata *)0xff65)
+  44          #define PWM7T1          (*(unsigned int volatile xdata *)0xff70)
+  45          #define PWM7T2          (*(unsigned int volatile xdata *)0xff72)
+  46          #define PWM7CR          (*(unsigned char volatile xdata *)0xff74)
+  47          #define PWM7HLD         (*(unsigned char volatile xdata *)0xff75)
+  48          
+  49          void main()
+  50          {
+  51   1          P_SW2 = 0x80;
+  52   1          CLKDIV=0x02;
+  53   1          PWMCKS = 0x0F;                              // PWM时钟为系统时钟
+  54   1          PWMC = 0x7fff;                              //设置PWM周期为32767H个PWM时钟
+  55   1          PWM0T1= 0x0000;                             //在计数值为000H地方输出低电平
+C51 COMPILER V9.59.0.0   8SE                                                               11/25/2018 13:59:00 PAGE 2   
+
+  56   1          PWM0T2= 20000;                             //在计数值为PWM0T2地方输出高电平,数值越小高电平时间越长
+  57   1          PWM0CR= 0x80;                               //使能PWM0输出
+  58   1          P_SW2 = 0x00;
+  59   1      
+  60   1          PWMCR = 0x80;                               //启动PWM模块
+  61   1      
+  62   1          while (1);
+  63   1      }
+  64          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     52    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
